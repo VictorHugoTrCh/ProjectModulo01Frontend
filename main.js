@@ -1,22 +1,37 @@
 const fs = require("fs")
 
 
+
 const checkFile = (file) => {
     return fs.existsSync(file)
 }
 
-//const startCleanData = () = {}
+const startCleanData = (data) => {
+    return data.replace("\r","").split(/\n/)
+}
+
+const validateDate = (dataDate) => /^\d{4}-\d{2}-\d{2}$/.test(dataDate)
+const stringNoNull = (text) => text.length !== 0
+const validateNumber = (num) => {}
+
 
 const readFile = (archivo) => {
     fs.readFile(archivo, 'utf8', (err, data) => {
         if (err) throw err;
-        
-        // Clean data
-        cleanData = data.replace("\r","").split(/\n/);
-        for(const line of cleanData){
-            console.log(line.split(","));
+        cleanData = startCleanData(data);
+
+        cleanData.forEach((line, idx) => {
+            const [dataDate, dataText, dataNum] = line.split(",");
+
+            console.log(dataDate,/^\d{4}-\d{2}-\d{2}$/.test(dataDate));
+            if(!validateDate(dataDate)) console.log(`line ${idx+1}: has an invalid date`);
+            if(!stringNoNull(dataText.trim())) console.log(`line ${idx+1}: has an invalid text`);
             
-        }
+            
+            
+        });
+
+        
         
       });
 }
