@@ -18,45 +18,62 @@ const validateNumber = (num) => {return !isNaN(num) && Number(num) > 0 && Number
 const readFile = (archivo) => {
     fs.readFile(archivo, 'utf8', (err, data) => {
         if (err) throw err;
-        const cleanData = startCleanData(data);
+
+        try {
+            const cleanData = startCleanData(data);
         
 
-        cleanData.forEach((line, idx) => {
-            if (line.trim() === "") return; 
+            cleanData.forEach((line, idx) => {
+                if (line.trim() === "") return; 
+                
+                const lineNumber = idx + 1;
+                const parts = line.split(",");
+                const [dataDate, dataText, dataNum] = parts;
+                
+                
+                if (parts.length !== 3) {
+                    console.log(`line ${lineNumber}: has an invalid format, must have 3 fields`);
+                    return;
+                }
+                
+    
+    
+                //console.log(dataDate,/^\d{4}-\d{2}-\d{2}$/.test(dataDate));
+                if(!validateDate(dataDate)) console.log(`line ${lineNumber}: Fecha Invalida`);
+                if(!stringNoNull(dataText?.trim())) console.log(`line ${lineNumber}: Texto invalido`);
+                if(!validateNumber(dataNum)) console.log(`line ${lineNumber}: ID Invalido`);
+                
+                
+                
+            });
             
-            const lineNumber = idx + 1;
-            const parts = line.split(",");
-            const [dataDate, dataText, dataNum] = parts;
-            
-            
-            if (parts.length !== 3) {
-                console.log(`line ${lineNumber}: has an invalid format, must have 3 fields`);
-                return;
-            }
-            
+        } catch (error) {
+            console.error("Error al leer el archivo:", error.message);
+        }
 
 
-            //console.log(dataDate,/^\d{4}-\d{2}-\d{2}$/.test(dataDate));
-            if(!validateDate(dataDate)) console.log(`line ${lineNumber}: Fecha Invalida`);
-            if(!stringNoNull(dataText?.trim())) console.log(`line ${lineNumber}: Texto invalido`);
-            if(!validateNumber(dataNum)) console.log(`line ${lineNumber}: ID Invalido`);
-            
-            
-            
-        });
     });
         
       }
 
 
 function main(){
-    const archivo = process.argv[2]
+    try{
+        const archivo = process.argv[2]
 
-    if(checkFile(archivo)){
-        readFile(archivo)
-    }else{
-        console.log("el archivo no fue encontrado");   
-    }  
+        if (!archivo) {
+            console.log("Por favor proporcione la ruta del archivo como argumento");
+            return;
+        }
+
+        if(checkFile(archivo)){
+            readFile(archivo)
+        }else{
+            console.log("El archivo no fue encontrado");   
+        }
+    } catch (error) {
+        console.error("Error:", error.message);
+    }
 }
     
 main()
